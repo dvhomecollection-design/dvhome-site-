@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DV HOME — Артдом</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100dvh;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ===== WELCOME SCREEN ===== */
+        .welcome {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .welcome.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .welcome-box {
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+
+        .welcome-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-sub {
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        .welcome-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 300;
+            color: #aaa;
+            margin-bottom: 32px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-label {
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 300;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field::placeholder { color: #333; }
+        .input-field:focus { border-color: #555; }
+
+        .input-error {
+            border-color: #666 !important;
+        }
+
+        .welcome-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 12px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .welcome-btn:active { opacity: 0.7; }
+        .welcome-btn:disabled { opacity: 0.3; }
+
+        .welcome-status {
+            font-size: 11px;
+            font-weight: 300;
+            color: #555;
+            margin-top: 14px;
+            min-height: 16px;
+        }
+
+        .welcome-status.error { color: #888; }
+
+        /* ===== MAIN CONTENT (hidden until welcome done) ===== */
+        .main-content {
+            display: none;
+        }
+
+        .main-content.visible { display: block; }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 60px 16px 40px;
+        }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 52px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            color: #fff;
+        }
+
+        .greeting {
+            font-size: 13px;
+            font-weight: 300;
+            color: #555;
+            margin-top: 14px;
+        }
+
+        .greeting span { color: #fff; }
+
+        .subtitle {
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: #333;
+            margin: 24px auto 0;
+        }
+
+        /* Carousel */
+        .carousel-wrapper { padding: 30px 0 20px; }
+
+        .carousel-label {
+            font-size: 9px;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #444;
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 20px 20px;
+            scrollbar-width: none;
+        }
+
+        .carousel::-webkit-scrollbar { display: none; }
+
+        /* Card */
+        .card {
+            flex: 0 0 200px;
+            scroll-snap-align: start;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 16px 20px;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        .placeholder-icon {
+            width: 100%;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.2;
+            margin-bottom: 16px;
+        }
+
+        .placeholder-icon svg {
+            width: 70px;
+            height: 70px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 1;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .card-img img {
+            max-width: 100%;
+            max-height: 130px;
+            object-fit: contain;
+        }
+
+        .card-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-align: center;
+            color: #fff;
+        }
+
+        /* Dots */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding-bottom: 30px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #222;
+            transition: background 0.3s;
+        }
+
+        .dot.active { background: #fff; }
+
+        /* Socials */
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            padding: 10px 0 50px;
+        }
+
+        .socials a {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #222;
+            border-radius: 50%;
+            transition: border-color 0.2s;
+        }
+
+        .socials a:active { border-color: #fff; }
+
+        .socials a svg {
+            width: 20px;
+            height: 20px;
+            fill: #666;
+            transition: fill 0.2s;
+        }
+
+        .socials a:active svg { fill: #fff; }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            flex-direction: column;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #000;
+            border-bottom: 1px solid #111;
+        }
+
+        .modal-back {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-back svg {
+            width: 18px;
+            height: 18px;
+            stroke: #fff;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .modal-header-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 400;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .modal-header-spacer { width: 60px; }
+
+        .modal-img {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #050505;
+            flex-shrink: 0;
+        }
+
+        .modal-img img {
+            max-width: 85%;
+            max-height: 280px;
+            object-fit: contain;
+        }
+
+        .modal-img .placeholder-icon {
+            height: 100%;
+            margin-bottom: 0;
+        }
+
+        .modal-body { padding: 28px 20px 40px; }
+
+        .modal-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            margin-bottom: 28px;
+            color: #fff;
+        }
+
+        .specs {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spec-item {
+            border-left: 1px solid #333;
+            padding-left: 16px;
+        }
+
+        .spec-label {
+            font-size: 10px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-size: 16px;
+            font-weight: 300;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .welcome { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+            .modal-header { padding-top: calc(16px + env(safe-area-inset-top)); }
+            .modal-body { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Screen -->
+    <div class="welcome" id="welcome">
+        <div class="welcome-box">
+            <h1 class="welcome-brand">DV HOME</h1>
+            <p class="welcome-sub">Артдом &middot; Москва</p>
+            <p class="welcome-title">Добро пожаловать</p>
+            <form id="welcomeForm" onsubmit="return submitWelcome(event)">
+                <div class="input-group">
+                    <label class="input-label">Ваше имя</label>
+                    <input type="text" class="input-field" id="inputName" placeholder="Имя" autocomplete="name" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Электронная почта</label>
+                    <input type="email" class="input-field" id="inputEmail" placeholder="email@example.com" autocomplete="email" required>
+                </div>
+                <button type="submit" class="welcome-btn" id="welcomeBtn">Войти</button>
+            </form>
+            <p class="welcome-status" id="welcomeStatus"></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <header>
+            <h1 class="brand">DV HOME</h1>
+            <p class="greeting">Добро пожаловать, <span id="userName"></span></p>
+            <p class="subtitle">Артдом &middot; Москва</p>
+            <div class="divider"></div>
+        </header>
+
+        <div class="carousel-wrapper">
+            <p class="carousel-label">Модели</p>
+            <div class="carousel" id="carousel">
+
+                <div class="card" onclick="openModal('bed')">
+                    <div class="card-img" id="img-bed">
+                        <img src="beverly-removebg-preview.png" alt="Beverly">
+                    </div>
+                    <h2 class="card-name">Beverly</h2>
+                </div>
+
+                <div class="card" onclick="openModal('pouf')">
+                    <div class="card-img" id="img-pouf">
+                        <img src="Coco-Pouf-contenitore013-removebg-preview.png" alt="Coco Pouf">
+                    </div>
+                    <h2 class="card-name">Coco Pouf</h2>
+                </div>
+
+                <div class="card" onclick="openModal('panca')">
+                    <div class="card-img" id="img-panca">
+                        <img src="Elite-panca_prev-removebg-preview.png" alt="Elite Panca">
+                    </div>
+                    <h2 class="card-name">Elite Panca</h2>
+                </div>
+
+                <div class="card" onclick="openModal('tavolo')">
+                    <div class="card-img" id="img-tavolo">
+                        <img src="Windsor-Lounge-tavolo_prev-removebg-preview.png" alt="Windsor Tavolo">
+                    </div>
+                    <h2 class="card-name">Windsor Tavolo</h2>
+                </div>
+
+                <div class="card" onclick="openModal('poltrona')">
+                    <div class="card-img" id="img-poltrona">
+                        <img src="manhattan_poltrona_preview-removebg-preview.png" alt="Manhattan Poltrona">
+                    </div>
+                    <h2 class="card-name">Manhattan</h2>
+                </div>
+
+                <div class="card" onclick="openModal('buffet')">
+                    <div class="card-img" id="img-buffet">
+                        <img src="ant-hollywood-buffet-removebg-preview.png" alt="Hollywood Buffet">
+                    </div>
+                    <h2 class="card-name">Hollywood Buffet</h2>
+                </div>
+
+                <div class="card" onclick="openModal('comodino')">
+                    <div class="card-img" id="img-comodino">
+                        <img src="elite-comod-ant2-removebg-preview.png" alt="Elite Comodino">
+                    </div>
+                    <h2 class="card-name">Elite Comodino</h2>
+                </div>
+
+                <div class="card" onclick="openModal('consolle')">
+                    <div class="card-img" id="img-consolle">
+                        <img src="coco-consolle-beauty-ant-removebg-preview.png" alt="Coco Consolle">
+                    </div>
+                    <h2 class="card-name">Coco Consolle</h2>
+                </div>
+
+                <div class="card" onclick="openModal('coco_ant')">
+                    <div class="card-img" id="img-coco_ant">
+                        <img src="coco-ant-removebg-preview.png" alt="Coco Ant">
+                    </div>
+                    <h2 class="card-name">Coco</h2>
+                </div>
+
+                <div class="card" onclick="openModal('metropolitan')">
+                    <div class="card-img" id="img-metropolitan">
+                        <img src="metropolitan-removebg-preview.png" alt="Metropolitan">
+                    </div>
+                    <h2 class="card-name">Metropolitan</h2>
+                </div>
+
+                <div class="card" onclick="openModal('chandelier')">
+                    <div class="card-img" id="img-chandelier">
+                        <img src="Gordon-Plaza-lampadario_chandelier-removebg-preview.png" alt="Gordon Plaza Chandelier">
+                    </div>
+                    <h2 class="card-name">Gordon Plaza</h2>
+                </div>
+
+                <div class="card" onclick="openModal('lamp_gordon')">
+                    <div class="card-img" id="img-lamp_gordon">
+                        <img src="Gordon-lampada-tavolo_table-lamp-scaled-removebg-preview.png" alt="Gordon Lamp">
+                    </div>
+                    <h2 class="card-name">Gordon Lamp</h2>
+                </div>
+
+                <div class="card" onclick="openModal('lamp_windsor')">
+                    <div class="card-img" id="img-lamp_windsor">
+                        <img src="Windsor-lampada-tavolo-removebg-preview.png" alt="Windsor Lamp">
+                    </div>
+                    <h2 class="card-name">Windsor Lamp</h2>
+                </div>
+
+                <div class="card" onclick="openModal('lamp_manhattan')">
+                    <div class="card-img" id="img-lamp_manhattan">
+                        <img src="ant_manattham_lamp-removebg-preview.png" alt="Manhattan Lamp">
+                    </div>
+                    <h2 class="card-name">Manhattan Lamp</h2>
+                </div>
+
+            </div>
+            <div class="dots" id="dots"></div>
+        </div>
+
+        <div class="socials">
+            <!-- Website -->
+            <a href="https://www.dvhomecollection.it" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#666" stroke-width="1.5"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z" fill="none" stroke="#666" stroke-width="1.5"/></svg>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-header">
+            <button class="modal-back" onclick="closeModal()">
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                Назад
+            </button>
+            <span class="modal-header-title" id="modalHeaderTitle"></span>
+            <span class="modal-header-spacer"></span>
+        </div>
+        <div class="modal-img" id="modalImg"></div>
+        <div class="modal-body">
+            <h2 class="modal-name" id="modalName"></h2>
+            <div class="specs">
+                <div class="spec-item">
+                    <p class="spec-label">Отделка металла</p>
+                    <p class="spec-value" id="specMetal"></p>
+                </div>
+                <div class="spec-item">
+                    <p class="spec-label">Кожа</p>
+                    <p class="spec-value" id="specLeather"></p>
+                </div>
+                <div class="spec-item">
+                    <p class="spec-label">Размеры</p>
+                    <p class="spec-value" id="specSize"></p>
+                </div>
+                <div class="spec-item">
+                    <p class="spec-label">Цена</p>
+                    <p class="spec-value" id="specPrice"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== ВСТАВЬТЕ СЮДА ВАШ URL Google Apps Script ======
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzstgkvTf7gR0faOaYkOPNgCgDQhrxvQat8ItdxnvL21FrSTZNtOXg4zAeS3nZqSdI/exec';
+
+        // Welcome
+        function submitWelcome(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputName').value.trim();
+            const email = document.getElementById('inputEmail').value.trim();
+            const btn = document.getElementById('welcomeBtn');
+            const status = document.getElementById('welcomeStatus');
+
+            if (!name || !email) return false;
+
+            // Disable button while sending
+            btn.disabled = true;
+            btn.textContent = 'Отправка...';
+            status.textContent = '';
+            status.className = 'welcome-status';
+
+            // Send to Google Sheets
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, email: email })
+            })
+            .then(function() {
+                // Show main content
+                document.getElementById('userName').textContent = name;
+                document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('mainContent').classList.add('visible');
+                initCarousel();
+            })
+            .catch(function() {
+                // Even on error, let user in (data may have been saved)
+                document.getElementById('userName').textContent = name;
+                document.getElementById('welcome').classList.add('hidden');
+                document.getElementById('mainContent').classList.add('visible');
+                initCarousel();
+            });
+
+            return false;
+        }
+
+        // Products — заполните реальными данными
+        const products = {
+            bed: {
+                name: 'Кровать Beverly',
+                metal: 'Коньяк глосс',
+                leather: 'Royal Nabuk',
+                size: '200 × 180 × 120 см',
+                price: '8 000 €',
+                img: 'beverly-removebg-preview.png'
+            },
+            pouf: {
+                name: 'Пуф Coco',
+                metal: 'Shaded Glossy',
+                leather: 'Royal Nabuk',
+                size: 'D45 × H45 см',
+                price: '2 000 €',
+                img: 'Coco-Pouf-contenitore013-removebg-preview.png'
+            },
+            panca: {
+                name: 'Elite Panca',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'Elite-panca_prev-removebg-preview.png'
+            },
+            tavolo: {
+                name: 'Windsor Lounge Tavolo',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'Windsor-Lounge-tavolo_prev-removebg-preview.png'
+            },
+            poltrona: {
+                name: 'Manhattan Poltrona',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'manhattan_poltrona_preview-removebg-preview.png'
+            },
+            buffet: {
+                name: 'Hollywood Buffet',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'ant-hollywood-buffet-removebg-preview.png'
+            },
+            comodino: {
+                name: 'Elite Comodino',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'elite-comod-ant2-removebg-preview.png'
+            },
+            consolle: {
+                name: 'Coco Consolle Beauty',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'coco-consolle-beauty-ant-removebg-preview.png'
+            },
+            coco_ant: {
+                name: 'Coco',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'coco-ant-removebg-preview.png'
+            },
+            metropolitan: {
+                name: 'Metropolitan',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'metropolitan-removebg-preview.png'
+            },
+            chandelier: {
+                name: 'Gordon Plaza Chandelier',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'Gordon-Plaza-lampadario_chandelier-removebg-preview.png'
+            },
+            lamp_gordon: {
+                name: 'Gordon Table Lamp',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'Gordon-lampada-tavolo_table-lamp-scaled-removebg-preview.png'
+            },
+            lamp_windsor: {
+                name: 'Windsor Table Lamp',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'Windsor-lampada-tavolo-removebg-preview.png'
+            },
+            lamp_manhattan: {
+                name: 'Manhattan Lamp',
+                metal: '—',
+                leather: '—',
+                size: '—',
+                price: 'По запросу',
+                img: 'ant_manattham_lamp-removebg-preview.png'
+            }
+        };
+
+        // Carousel dots
+        function initCarousel() {
+            const carousel = document.getElementById('carousel');
+            const dotsContainer = document.getElementById('dots');
+            const cards = carousel.querySelectorAll('.card');
+
+            dotsContainer.innerHTML = '';
+            cards.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dotsContainer.appendChild(dot);
+            });
+
+            const dots = dotsContainer.querySelectorAll('.dot');
+
+            carousel.addEventListener('scroll', function() {
+                const scrollLeft = carousel.scrollLeft;
+                const cardWidth = cards[0].offsetWidth + 14;
+                const index = Math.round(scrollLeft / cardWidth);
+                dots.forEach((d, i) => d.classList.toggle('active', i === index));
+            }, { passive: true });
+        }
+
+        // Modal
+        function openModal(key) {
+            const p = products[key];
+            document.getElementById('modalName').textContent = p.name;
+            document.getElementById('modalHeaderTitle').textContent = p.name;
+            document.getElementById('specMetal').textContent = p.metal;
+            document.getElementById('specLeather').textContent = p.leather;
+            document.getElementById('specSize').textContent = p.size;
+            document.getElementById('specPrice').textContent = p.price;
+
+            const imgContainer = document.getElementById('modalImg');
+            if (p.img) {
+                imgContainer.innerHTML = '<img src="' + p.img + '" alt="' + p.name + '">';
+            } else {
+                const placeholder = document.getElementById('img-' + key);
+                imgContainer.innerHTML = placeholder.outerHTML;
+            }
+
+            document.getElementById('modalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('modalOverlay').scrollTop = 0;
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Swipe right to close
+        let touchStartX = 0;
+        const overlay = document.getElementById('modalOverlay');
+        overlay.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        overlay.addEventListener('touchend', function(e) {
+            const diff = e.changedTouches[0].clientX - touchStartX;
+            if (diff > 80) closeModal();
+        }, { passive: true });
+
+        // Back button
+        window.addEventListener('popstate', function() {
+            if (overlay.classList.contains('active')) closeModal();
+        });
+
+        const origOpen = openModal;
+        openModal = function(key) {
+            history.pushState({ modal: true }, '');
+            origOpen(key);
+        };
+    </script>
+
+</body>
+</html>
